@@ -1,0 +1,41 @@
+title Casb license validation flow
+
+bottomparticipants
+
+
+
+participant Manager
+participant Orchestrator
+participant LicenseService
+
+
+
+
+alt New connector creation
+activate Manager
+Manager->Manager: validate license \n using authz
+note over Manager:License is valid: do nothing
+Manager->Orchestrator: testConnector flow
+group #2f2e7b license is not valid #white 
+Manager->Orchestrator: toggleConnector - disable polling, no testConnector flow
+Manager->Manager: save connector with license required status
+deactivate Manager
+end
+end
+alt License validation periodic job
+activate Manager
+Manager->LicenseService: check accounts for specific SKU valid
+activate LicenseService
+LicenseService->Manager: return all accounts with valid license for this SKU
+deactivate LicenseService
+loop #2e7b6c iterate over accounts
+Manager->Orchestrator: toggleConnector - disable/enable polling
+Manager->Manager: Update status to success/license required
+deactivate Manager
+end
+end
+
+
+
+
+
